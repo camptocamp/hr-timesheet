@@ -20,4 +20,4 @@ class SaleOrderLine(models.Model):
     @api.multi
     @api.depends('analytic_line_ids.unit_amount_rounded')
     def _compute_qty_delivered(self):
-        super(SaleOrderLine, self)._compute_qty_delivered()
+        super()._compute_qty_delivered()

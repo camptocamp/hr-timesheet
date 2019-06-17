@@ -51,12 +51,9 @@ class AccountAnalyticLine(models.Model):
             self.project_id and
             self.project_id.timesheet_rounding_method != 'NO'
         )
-        expense_line = (
-            self.product_id and self.product_id.expense_policy != 'no'
-        )
         already_set = self.unit_amount_rounded and not force_compute
 
-        if project_rounding and not expense_line and not already_set:
+        if project_rounding and not already_set:
             return self._calc_rounded_amount(
                 self.project_id.timesheet_rounding_unit,
                 self.project_id.timesheet_rounding_method,

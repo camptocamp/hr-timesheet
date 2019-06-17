@@ -15,6 +15,7 @@ class AccountAnalyticLine(models.Model):
     unit_amount_rounded = fields.Float(
         string="Quantity rounded",
         default=0.0,
+        copy=False,
     )
 
     @api.model_cr_context
@@ -40,11 +41,6 @@ class AccountAnalyticLine(models.Model):
     def _calc_unit_amount_rounded(self):
         self.ensure_one()
         force_compute = self.env.context.get('force_compute')
-        if self.env.context.get('grid_adjust'):
-            # TODO: do we need this?
-            # support timesheet_grid from EE version
-            # force_compute if the timesheet is change in the grid view
-            force_compute = True
         # TODO: do we still need this?
         self = self.with_context(timesheet_rounding=True)
         project_rounding = (

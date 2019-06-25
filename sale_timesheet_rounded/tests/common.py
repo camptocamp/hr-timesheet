@@ -91,4 +91,3 @@ class TestSaleTimesheetCommon(SavepointCase):
             'taxes_id': False,
             'property_account_income_id': cls.account_sale.id,
         })
-

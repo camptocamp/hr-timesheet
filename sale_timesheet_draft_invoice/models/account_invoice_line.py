@@ -28,14 +28,16 @@ class AccountInvoice(models.Model):
                 domain = (
                     so_lines._timesheet_compute_delivered_quantity_domain()
                 )
-                domain = expression.AND(
-                    [domain, [('timesheet_invoice_id', '=', False)]]
-                )
+                domain = line._update_domain(domain)
                 uninvoiced_ts_lines = (
                     self.env['account.analytic.line'].sudo().search(domain)
                 )
                 if uninvoiced_ts_lines:
-                    # for ts_line in uninvoiced_ts_lines:
                     uninvoiced_ts_lines.write(
                         {'timesheet_invoice_id': line.invoice_id.id}
                     )
+
+    def _update_domain(self, domain):
+        return expression.AND(
+            [domain, [('timesheet_invoice_id', '=', False)]]
+        )

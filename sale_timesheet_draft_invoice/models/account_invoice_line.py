@@ -19,7 +19,7 @@ class AccountInvoice(models.Model):
             and invoice_line.invoice_id.state == 'draft'
         ):
             invoice_line.link_timesheets_lines()
-            return invoice_line
+        return invoice_line
 
     def link_timesheets_lines(self):
         for line in self:
@@ -36,6 +36,6 @@ class AccountInvoice(models.Model):
                 )
                 if uninvoiced_ts_lines:
                     # for ts_line in uninvoiced_ts_lines:
-                        uninvoiced_ts_lines.write(
-                            {'timesheet_invoice_id': line.invoice_id.id}
-                        )
+                    uninvoiced_ts_lines.write(
+                        {'timesheet_invoice_id': line.invoice_id.id}
+                    )

@@ -11,6 +11,6 @@
         'sale_timesheet',
         'account_cancel',
     ],
-    'website': 'https://www.camptocamp.com',
+    'website': 'https://github.com/OCA/timesheet',
     'installable': True,
 }

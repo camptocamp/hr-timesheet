@@ -57,24 +57,31 @@ class AccountInvoice(models.Model):
         # avoid recomputation if no lines concerned
         if not self:
             return False
+        product_uom = self.env['product.uom']
+
         for inv in invoices:
             ail_lines = self.filtered(lambda l: l.invoice_id == inv)
             so_lines = ail_lines.mapped('sale_line_ids')
-            domain = (
-                so_lines._timesheet_compute_delivered_quantity_domain()
+            domain = [('timesheet_invoice_id', '=', inv.id)]
+
+            data = self.env['account.analytic.line'].read_group(
+                domain,
+                ['so_line', 'unit_amount', 'product_uom_id'],
+                ['product_uom_id', 'so_line'], lazy=False
             )
-            domain = expression.AND(
-                [domain, [('timesheet_invoice_id', '=', inv.id)]]
-            )
-            lines = self.env['account.analytic.line'].search(domain)
-            for sol in so_lines:
-                # here we expect that in one invoice invoice lines have
+
+            for item in data:
+                # we expect that in one invoice invoice lines have
                 # unique so_line
-                ail = self.filtered(lambda l: l.sale_line_ids == sol)
-                if sol.qty_to_invoice != 0:
-                    # on this moment invoice has 'open' state and has impact
-                    # on invoiced qty in sale order to exclude it set to 0
-                    ail.quantity = 0
-                    # now we know how much is left to invoiced
-                    ail.quantity = sol.qty_to_invoice
+                so_id = item['so_line'][0]
+                so_line = so_lines.filtered(lambda l: l.id == so_id)
+                ail = self.filtered(lambda l: l.sale_line_ids == so_line)
+
+                # convert to uom
+                uom_id = item['product_uom_id'][0]
+                if not product_uom and product_uom.id != uom_id:
+                    product_uom = product_uom.browse(uom_id)
+                qty = item['unit_amount']
+                qty = product_uom._compute_quantity(qty, ail.uom_id)
+                ail.quantity = qty
         return True

@@ -70,9 +70,11 @@ class AccountInvoice(models.Model):
             for sol in so_lines:
                 # here we expect that in one invoice invoice lines have
                 # unique so_line
-                qty = sum(lines.filtered(
-                    lambda l: l.so_line == sol).mapped('unit_amount')
-                )
                 ail = self.filtered(lambda l: l.sale_line_ids == sol)
-                ail.write({'quantity': qty})
+                if sol.qty_to_invoice != 0:
+                    # on this moment invoice has 'open' state and has impact
+                    # on invoiced qty in sale order to exclude it set to 0
+                    ail.quantity = 0
+                    # now we know how much is left to invoiced
+                    ail.quantity = sol.qty_to_invoice
         return True

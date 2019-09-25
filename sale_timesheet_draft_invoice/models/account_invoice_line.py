@@ -22,24 +22,26 @@ class AccountInvoice(models.Model):
         return invoice_line
 
     def link_timesheets_lines(self):
-        if self.product_id.type == 'service':
-            so_lines = self.sale_line_ids.filtered(
-                lambda sol:
-                sol.product_id.invoice_policy == 'delivery'
-                and
-                sol.product_id.service_type == 'timesheet'
-            )
-            domain = (
-                so_lines._timesheet_compute_delivered_quantity_domain()
-            )
-            domain = self._update_domain(domain)
-            uninvoiced_ts_lines = (
-                self.env['account.analytic.line'].sudo().search(domain)
-            )
-            if uninvoiced_ts_lines:
-                uninvoiced_ts_lines.write(
-                    {'timesheet_invoice_id': self.invoice_id.id}
+        aal_model = self.env['account.analytic.line']
+        for line in self:
+            if line.product_id.type == 'service':
+                so_lines = line.sale_line_ids.filtered(
+                    lambda sol:
+                    sol.product_id.invoice_policy == 'delivery'
+                    and
+                    sol.product_id.service_type == 'timesheet'
                 )
+                domain = (
+                    so_lines._timesheet_compute_delivered_quantity_domain()
+                )
+                domain = line._update_domain(domain)
+                uninvoiced_ts_lines = (
+                    aal_model.sudo().search(domain)
+                )
+                if uninvoiced_ts_lines:
+                    uninvoiced_ts_lines.write(
+                        {'timesheet_invoice_id': line.invoice_id.id}
+                    )
 
     def _update_domain(self, domain):
         return expression.AND(

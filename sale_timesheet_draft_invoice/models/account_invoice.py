@@ -37,5 +37,6 @@ class AccountInvoice(models.Model):
         their update, othervise invoice will be set to paid state as
         amount equal 0
         """
-        if not self.env.context.get('not_recompute_state'):
-            super().action_invoice_paid()
+        if self.env.context.get('not_recompute_state'):
+            return
+        return super().action_invoice_paid()

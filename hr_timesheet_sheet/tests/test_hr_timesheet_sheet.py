@@ -272,7 +272,7 @@ class TestHrTimesheetSheet(SavepointCase):
         self.assertEqual(len(sheet_form.timesheet_ids), 1)
         self.assertEqual(len(sheet_form.line_ids), 7)
         self.assertFalse(
-            any([l.get("unit_amount") for l in sheet_form.line_ids._records])
+            any([line.get("unit_amount") for line in sheet_form.line_ids._records])
         )
         timesheet = sheet_form.timesheet_ids._records[0]
         self.assertEqual(timesheet.get("unit_amount"), 0)
@@ -282,7 +282,7 @@ class TestHrTimesheetSheet(SavepointCase):
         self.assertEqual(len(sheet_form.timesheet_ids), 1)
         self.assertEqual(len(sheet_form.line_ids), 7)
         self.assertTrue(
-            any([l.get("unit_amount") for l in sheet_form.line_ids._records])
+            any([line.get("unit_amount") for line in sheet_form.line_ids._records])
         )
 
         sheet = sheet_form.save()
